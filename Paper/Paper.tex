@@ -26,11 +26,11 @@ Bogotá, Colombia \\
 \maketitle
 
 \begin{abstract}
-Este trabajo presenta MacraScript, un lenguaje de programación específico de dominio (DSL) desarrollado para la creación y visualización de patrones de macramé. El macramé, una técnica artesanal basada en nudos decorativos, enfrenta desafíos en su planificación y diseño digital que pueden abordarse mediante un enfoque programático. MacraScript ofrece una sintaxis declarativa para especificar hilos, colores y secuencias de nudos, con el objetivo de generar tanto una vista previa visual del resultado final como guías detalladas de ejecución. Este paper describe la motivación, identificación del problema y propuesta conceptual del lenguaje. MacraScript busca tender un puente entre la programación y la artesanía tradicional, facilitando la creación de complejos patrones de macramé mediante herramientas computacionales.
+This work presents MacraScript, a domain-specific programming language (DSL) developed for the creation and visualization of macramé patterns. Macramé, a craft technique based on decorative knots, faces challenges in planning and digital design that can be addressed through a programmatic approach. MacraScript offers a declarative syntax to specify threads, colors, and knot sequences, with the goal of generating both a visual preview of the final result and detailed execution guides. This paper describes the motivation, problem identification, and conceptual proposal of the language. MacraScript seeks to bridge the gap between programming and traditional crafts, facilitating the creation of complex macramé patterns through computational tools.
 \end{abstract}
 
 \begin{IEEEkeywords}
-lenguajes específicos de dominio, macramé, patrones textiles, generación de gráficos, intérpretes, artesanía digital
+domain-specific languages, macramé, textile patterns, graphics generation, interpreters, digital crafts
 \end{IEEEkeywords}
 
 \section{Introducción}
@@ -64,7 +64,9 @@ A continuación se muestra un ejemplo simplificado de la sintaxis para un patró
 PATTERN MyFirstAlpha {
     TYPE: ALPHA;
     THREADS: 12;
-    BACKGROUND_COLOR: "white";    DEFINE_COLOR: C1 = "black", C2 = "green_light";
+    BACKGROUND_COLOR: "white";
+    DEFINE_COLOR: C1 = "black";
+    DEFINE_COLOR: C2 = "green_light";
     
     ROW 1: [C1, C1, C2, C2, C1, C1];
     ROW 2: [C1, C2, C1, C1, C2, C1];
@@ -78,10 +80,15 @@ Para patrones con nudos estructurales tridimensionales, la sintaxis propuesta pe
 PATTERN ChevronBracelet {
     TYPE: NORMAL;
     THREADS: 8;
-    DEFINE_COLOR: A = "red", B = "blue";
+    DEFINE_COLOR: A = "red";
+    DEFINE_COLOR: B = "blue";
     SETUP_THREADS: [A,A,B,B,B,B,A,A];
 
-    ROW { KNOTS: [(1,2,"fk"), (3,4,"fk"), (5,6,"fk")]; }
+    ROW { 
+        KNOTS: [(1,2,"fk"), 
+                (3,4,"fk"), 
+                (5,6,"fk")]; 
+    }
     REPEAT ROW 5 TIMES;
 }
 \end{verbatim}

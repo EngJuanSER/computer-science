@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.7.13)  12 MAY 2025 23:12
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.7.13)  13 MAY 2025 11:51
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -803,16 +803,6 @@ LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 6
 (C:\Users\juan_\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
-Overfull \hbox (234.0pt too wide) in paragraph at lines 73--73
-[]    \OT1/pcr/m/n/10 BACKGROUND_COLOR: "white";    DEFINE_COLOR: C1 = "black",
- C2 = "green_light";[] 
- []
-
-
-Overfull \hbox (84.0pt too wide) in paragraph at lines 87--87
-[]    \OT1/pcr/m/n/10 ROW { KNOTS: [(1,2,"fk"), (3,4,"fk"), (5,6,"fk")]; }[] 
- []
-
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -835,18 +825,18 @@ Package rerunfilecheck Info: File `Paper.out' has not changed.
 Here is how much of TeX's memory you used:
  21477 strings out of 474485
  401875 string characters out of 5743734
- 1951542 words of memory out of 5000000
+ 1949542 words of memory out of 5000000
  43414 multiletter control sequences out of 15000+600000
  586815 words of font info for 85 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,8n,87p,869b,441s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,8n,87p,779b,441s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/juan_/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmsy10.pfb><C:/Users/juan_/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courie
 r/ucrr8a.pfb><C:/Users/juan_/AppData/Local/Programs/MiKTeX/fonts/type1/urw/time
 s/utmb8a.pfb><C:/Users/juan_/AppData/Local/Programs/MiKTeX/fonts/type1/urw/time
 s/utmbi8a.pfb><C:/Users/juan_/AppData/Local/Programs/MiKTeX/fonts/type1/urw/tim
 es/utmr8a.pfb>
-Output written on Paper.pdf (2 pages, 88907 bytes).
+Output written on Paper.pdf (2 pages, 88569 bytes).
 PDF statistics:
  92 PDF objects out of 1000 (max. 8388607)
  17 named destinations out of 1000 (max. 500000)
