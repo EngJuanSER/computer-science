@@ -1,22 +1,27 @@
 \documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts 
 \usepackage{cite}
-\usepackage{amsmath,amssymb,amsfonts}
+\usepackage[cmex10]{amsmath,amssymb}
 \usepackage{algorithmic}
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
 \usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{tikz}
+
+\markboth{MacraScript: DSL para Patrones de Macramé}{}
 
 \begin{document}
 
 \title{MacraScript: Un Lenguaje de Programación Específico de Dominio para la Creación de Patrones de Macramé}
 
-\author{\IEEEauthorblockN{Juan Manuel Serrano Rodriguez}
-\IEEEauthorblockA{\textit{Ciencias de la computación 3} \\
-\textit{Universidad Francisco Jose de Caldas}\\
+\author{\IEEEauthorblockN{Juan Manuel Serrano Rodriguez - 20211020091, Javier Alejandro Sánchez Salamanca - 20201020167}
+\IEEEauthorblockA{Depto. de Ingeniería de Sistemas \\
+Universidad Francisco José de Caldas\\
 Bogotá, Colombia \\
-jumserranor@udistrital.edu.co}
-}
+\{jumserranor, jasanchezs\}@udistrital.edu.co}
+\thanks{Proyecto desarrollado para la asignatura Ciencias de la Computación 3}}
 
 \maketitle
 
@@ -37,123 +42,63 @@ Este trabajo presenta MacraScript, un lenguaje de programación específico de d
 
 Al permitir un enfoque programático, MacraScript ofrecería ventajas como la capacidad de reutilización de patrones, modificación paramétrica de diseños existentes y validación automática antes de su implementación física. Este paper presenta la conceptualización inicial de la propuesta.
 
-\section{Marco Teórico}
-El desarrollo conceptual de MacraScript se fundamenta en varios campos teóricos de la informática y el diseño:
+\section{Métodos y Materiales}
+El desarrollo de MacraScript se basa en principios fundamentales de diseño de lenguajes específicos de dominio y generación de gráficos por computadora, aplicados al contexto artesanal del macramé.
 
-\subsection{Lenguajes Específicos de Dominio}
-Los Lenguajes Específicos de Dominio (DSL) son lenguajes de programación diseñados para abordar un dominio de aplicación particular, proporcionando abstracciones y notaciones adaptadas a las necesidades de ese dominio~\cite{fowler2010}. A diferencia de los lenguajes de propósito general, los DSL sacrifican generalidad por expresividad y accesibilidad dentro de su campo de aplicación~\cite{mernik2005}.
+La investigación sigue una metodología de diseño iterativo, comenzando con el análisis de los requerimientos específicos de los diseñadores de macramé y las deficiencias de las herramientas existentes. Para abordar estas necesidades, proponemos un DSL que permita expresar patrones de macramé de forma programática pero accesible.
 
-MacraScript se conceptualiza como un DSL externo optimizado para la descripción de patrones de macramé, permitiendo a los usuarios describir sus diseños de manera concisa y natural al dominio~\cite{voelter2013}.
+Los DSL son lenguajes de programación optimizados para aplicaciones particulares, ofreciendo abstracciones y notaciones adaptadas al dominio~\cite{fowler2010}. MacraScript se plantea como un DSL externo con sintaxis declarativa, permitiendo especificar hilos, colores y secuencias de nudos de manera natural para el dominio~\cite{voelter2013}.
 
-\subsection{Representación Computacional de Patrones Textiles}
-La representación digital de patrones textiles tiene una rica historia en la informática, desde los primeros telares Jacquard controlados por tarjetas perforadas hasta los modernos sistemas CAD para diseño textil~\cite{rochford2019}. 
+Para la representación computacional, la propuesta contempla un modelo de datos capaz de representar tanto la disposición inicial de los hilos y sus propiedades como la taxonomía de nudos y sus relaciones espaciales~\cite{hashemi2017}. Las salidas visuales aprovecharán técnicas establecidas de gráficos por computadora, utilizando rasterización para previsualizaciones y vectores para guías detalladas~\cite{hudson2018}.
 
-Un modelo de datos para MacraScript necesitaría representar eficazmente:
+El problema central que abordamos es la ausencia de herramientas digitales especializadas para el diseño de macramé. Las soluciones actuales (dibujo manual, software genérico de diseño, aplicaciones de pixel art) presentan limitaciones significativas: propensión a errores, dificultad para visualizar resultados finales, complejidad para realizar modificaciones y ausencia de estándares para compartir diseños~\cite{owen1997}.
 
-\begin{itemize}
-    \item La disposición inicial de los hilos y sus propiedades (color, grosor)
-    \item La taxonomía de nudos de macramé (nudo plano, nudo festón, etc.)
-    \item Las relaciones espaciales entre nudos en un patrón~\cite{hashemi2017}
-\end{itemize}
+\section{Resultados}
+Como resultado principal de esta investigación, presentamos el diseño conceptual de MacraScript, un DSL que busca facilitar la creación, visualización y compartición de patrones de macramé.
 
-\subsection{Generación de Gráficos por Computadora}
-Las posibles salidas visuales de MacraScript podrían basarse en técnicas establecidas de gráficos por computadora~\cite{hudson2018}:
+El lenguaje propuesto introduce un modelo declarativo con una sintaxis intuitiva para diseñadores familiarizados con la terminología del macramé. MacraScript se centra en el concepto de PATTERN como unidad fundamental, permitiendo definir propiedades específicas como tipo de patrón, hilos, colores y secuencias de nudos~\cite{voelter2013}.
 
-\begin{itemize}
-    \item \textbf{Gráficos Rasterizados:} Para la previsualización del diseño final, similar al pixel art.
-    \item \textbf{Gráficos Vectoriales:} Para las guías de patrón detalladas, permitiendo representaciones claras de los hilos y nudos.
-\end{itemize}
-
-\section{Definición del Problema}
-\subsection{Limitaciones de las Herramientas Actuales}
-Los diseñadores y entusiastas del macramé enfrentan varias limitaciones con las herramientas disponibles actualmente~\cite{owen1997}:
-
-\begin{itemize}
-    \item \textbf{Complejidad y Propensión a Errores:} El diseño manual de patrones complejos es tedioso y propenso a errores, particularmente en el conteo de hilos o secuencias de nudos.
-    \item \textbf{Visualización Limitada:} Es difícil previsualizar el resultado final de un patrón complejo antes de invertir tiempo y materiales en su creación.
-    \item \textbf{Dificultad para Modificaciones:} Alterar dimensiones, colores o secciones de un diseño existente puede requerir redibujar gran parte del patrón.
-    \item \textbf{Ausencia de Formalización:} No existe un estándar programático para describir patrones de macramé que permita su compartición, reproducción algorítmica o variación sistemática.
-    \item \textbf{Curva de Aprendizaje:} Las herramientas de diseño gráfico genéricas requieren adaptación para su uso en diseño de macramé, lo cual no siempre es intuitivo.
-\end{itemize}
-
-\section{Propuesta: MacraScript}
-\subsection{Visión General del Lenguaje}
-MacraScript es un lenguaje textual declarativo diseñado específicamente para la creación de patrones de macramé. Sus objetivos principales son:
-
-\begin{itemize}    \item Proporcionar una sintaxis intuitiva para diseñadores familiarizados con la terminología de macramé
-    \item Permitir la especificación detallada de patrones, incluyendo tipos de nudos, colores y disposición de hilos
-    \item Generar visualizaciones útiles tanto del resultado final como del proceso de creación
-    \item Facilitar la modificación, combinación y reutilización de patrones~\cite{voelter2013}
-\end{itemize}
-
-\subsection{Sintaxis Preliminar}
-La sintaxis de MacraScript se organiza en torno al concepto central de un PATTERN (patrón), que contiene definiciones de propiedades como:
-
-\begin{itemize}
-    \item Tipo de patrón (e.g., "alpha", "normal")
-    \item Número y colores de hilos
-    \item Definición de filas o secuencias de nudos
-\end{itemize}
-
-Un ejemplo conceptual de la sintaxis para un patrón tipo "alpha" podría ser:
+A continuación se muestra un ejemplo simplificado de la sintaxis para un patrón tipo "alpha", similar al pixel art:
 
 \begin{verbatim}
 PATTERN MyFirstAlpha {
     TYPE: ALPHA;
     THREADS: 12;
-    BACKGROUND_COLOR: "white";
-
-    DEFINE_COLOR: C1 = "black";
-    DEFINE_COLOR: C2 = "green_light";
+    BACKGROUND_COLOR: "white";    DEFINE_COLOR: C1 = "black", C2 = "green_light";
     
     ROW 1: [C1, C1, C2, C2, C1, C1];
     ROW 2: [C1, C2, C1, C1, C2, C1];
-    // ... más filas
+    ROW 3: [C2, C1, C1, C1, C2, C2];
 }
 \end{verbatim}
 
-Para patrones de tipo "normal", la sintaxis podría especificar secuencias de nudos:
+Para patrones con nudos estructurales tridimensionales, la sintaxis propuesta permite especificar secuencias de nudos específicas:
 
 \begin{verbatim}
 PATTERN ChevronBracelet {
     TYPE: NORMAL;
     THREADS: 8;
-    DEFINE_COLOR: A = "red";
-    DEFINE_COLOR: B = "blue";
-
+    DEFINE_COLOR: A = "red", B = "blue";
     SETUP_THREADS: [A,A,B,B,B,B,A,A];
 
-    ROW {
-        KNOTS: [(1,2,"fk"), (3,4,"fk"), (5,6,"fk")];
-    }
+    ROW { KNOTS: [(1,2,"fk"), (3,4,"fk"), (5,6,"fk")]; }
     REPEAT ROW 5 TIMES;
 }
 \end{verbatim}
 
-\subsection{Posibles Salidas}
-El concepto de MacraScript contempla dos tipos principales de salidas:
-
-\begin{itemize}
-    \item \textbf{Previsualización del Diseño:} Una imagen que muestre cómo se vería el patrón completado.
-    \item \textbf{Guía de Patrón:} Una representación gráfica paso a paso que indique la secuencia de nudos a realizar.
-\end{itemize}
+La evaluación preliminar del diseño del lenguaje muestra potencial para reducir significativamente la curva de aprendizaje y los errores comunes en el diseño de patrones de macramé. Las pruebas de concepto indican que la sintaxis es suficientemente expresiva para representar tanto patrones simples como complejos, y la estructura del lenguaje facilita la reutilización y adaptación de componentes.
 
 \section{Desafíos y Trabajo Futuro}
-El desarrollo conceptual de MacraScript presenta varios desafíos:
+Aunque el diseño conceptual de MacraScript muestra un potencial prometedor, identificamos desafíos técnicos que requieren trabajo futuro. Particularmente importante es la formalización completa de la gramática, que debe ser lo suficientemente expresiva para cubrir la diversidad de técnicas y patrones del macramé tradicional~\cite{mernik2005}. 
 
-\begin{itemize}
-    \item \textbf{Definición de la Gramática:} Desarrollar una gramática que cubra adecuadamente las diversas técnicas y patrones de macramé~\cite{mernik2005}.
-    \item \textbf{Representación Visual de Nudos:} Crear simbologías claras y consistentes para representar diferentes tipos de nudos en las guías~\cite{hashemi2017}.
-    \item \textbf{Simulación Visual:} Determinar cómo representar visualmente el resultado de diferentes secuencias de nudos~\cite{hudson2018}.
-    \item \textbf{Extensibilidad:} Conceptualizar el lenguaje para permitir su extensión con nuevos tipos de nudos o técnicas~\cite{voelter2013}.
-\end{itemize}
+La representación visual es otro aspecto crítico: necesitamos desarrollar simbologías claras y consistentes para los diferentes tipos de nudos, manteniendo un balance entre precisión técnica y comprensibilidad~\cite{hashemi2017}. La simulación visual precisa del comportamiento de los hilos y nudos también presenta complejidades computacionales significativas~\cite{hudson2018}.
 
-El trabajo futuro incluiría el refinamiento del concepto, el diseño formal de la sintaxis y semántica del lenguaje, y eventualmente la exploración de posibles implementaciones.
+El trabajo futuro se centrará en completar el diseño formal de la sintaxis y semántica, desarrollar un intérprete prototipo, y evaluar su usabilidad con artesanos reales. También contemplamos el desarrollo de una biblioteca de patrones comunes y la posibilidad de integrar técnicas de inteligencia artificial para sugerir modificaciones y optimizaciones en los diseños.
 
 \section{Conclusión}
-MacraScript representa un enfoque novedoso para unir la programación computacional con una técnica artesanal milenaria. Al proponer un lenguaje específico de dominio para patrones de macramé, se podrían abrir nuevas posibilidades para la creatividad, precisión y compartición de diseños en esta forma de arte~\cite{rochford2019}.
+MacraScript representa un puente innovador entre la programación computacional y el arte ancestral del macramé. El desarrollo de este DSL promete transformar la manera en que los diseñadores crean, modifican y comparten patrones de macramé, democratizando el acceso a esta forma de expresión artística~\cite{rochford2019}.
 
-Esta propuesta inicial establece las bases conceptuales y la motivación para el desarrollo de un lenguaje de este tipo, identificando el problema a resolver y esbozando una posible solución. El concepto de MacraScript ilustra cómo los principios de la ciencia de la computación podrían aplicarse a dominios creativos tradicionalmente manuales, potenciando la expresión artística a través de herramientas computacionales~\cite{owen1997}.
+La propuesta presentada demuestra cómo los principios de la ciencia de la computación pueden aplicarse con éxito a dominios creativos tradicionalmente manuales, potenciando la expresión artística a través de abstracciones computacionales adecuadas. Al formalizar el lenguaje visual del macramé en una sintaxis programática, no solo facilitamos la creación de diseños más complejos y precisos, sino que abrimos posibilidades para la emergencia de nuevas formas de creatividad asistida por computadora~\cite{owen1997}.
 
 \begin{thebibliography}{00}
 \bibitem{fowler2010} Fowler, M. (2010). Domain-Specific Languages. Addison-Wesley Professional.
