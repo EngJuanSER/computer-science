@@ -1,0 +1,12 @@
+START ALPHA
+THREADS: 4
+WIDTH: 4
+HEIGHT: 4
+COLORS: ("red", "blue")
+PATTERN {
+    ROW: (0, 1, 0, 1)
+    ROW: (1, 0, 1, 0)
+    ROW: (0, 1, 0, 1)
+    ROW: (1, 0, 1, 0)
+}
+END

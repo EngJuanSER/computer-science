@@ -1,0 +1,20 @@
+START NORMAL
+THREADS: 8
+COLORS: ("red", "blue", "yellow", "green")
+PATTERN {
+    KNOT LEFT (1, 2)
+    KNOT RIGHT (2, 3)
+    KNOT LEFT (3, 4)
+    KNOT RIGHT (4, 5)
+    KNOT LEFT (5, 6)
+    KNOT RIGHT (6, 7)
+    KNOT LEFT (7, 8)
+    KNOT LEFT (2, 3)
+    KNOT RIGHT (4, 5)
+    KNOT LEFT (6, 7)
+    KNOT RIGHT (1, 2)
+    KNOT LEFT (3, 4)
+    KNOT RIGHT (5, 6)
+    KNOT LEFT (7, 8)
+}
+END

@@ -412,6 +412,20 @@ class SintacticAnalyzer:
             expected (str): The expected token.
         """
         current = self.current_token.value if self.current_token else "EOF"
+        current_type = self.current_token.type_ if self.current_token else "None"
+        
+        # Mostrar información adicional para depuración
+        print(f"Error: expected {expected}, found '{current}' of type {current_type} at position {self.pos}")
+        
+        # Si hay más tokens, mostrar algunos adelante para contexto
+        context_tokens = []
+        for i in range(self.pos + 1, min(self.pos + 4, len(self.tokens))):
+            token = self.tokens[i]
+            context_tokens.append(f"{token.type_}:'{token.value}'")
+        
+        if context_tokens:
+            print(f"Next tokens: {', '.join(context_tokens)}")
+        
         raise SyntaxError(
             f"Syntax error at position {self.pos}: expected {expected}, found '{current}'"
         )

@@ -46,8 +46,7 @@ class LexicalAnalizer:
             ("RPAREN",              r'\)'),
             
             # Others
-            ("NEWLINE",             r'\n'),
-            ("SKIP",                r'[ \t]+'),
+            ("SKIP",                r'[ \t\r\n]+'), # Ignore spaces, tabs, and newlines
             ("MISMATCH",            r'.')
         ]
 
