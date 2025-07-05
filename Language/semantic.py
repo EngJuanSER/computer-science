@@ -373,7 +373,7 @@ class SemanticAnalyzer:
         self.pattern.rows = rows
     
     def _process_row(self):
-        """Process a single ROW definition."""
+        """Process a single ROW definition for either ALPHA or NORMAL patterns."""
         # Skip ROW keyword
         self._advance()
         
@@ -393,16 +393,19 @@ class SemanticAnalyzer:
             
         self._advance()
         
-        # Process color sequence
-        color_indices = self._process_color_sequence()
-        
+        # Process sequence based on pattern type
+        if self.pattern.pattern_type == "ALPHA":
+            sequence = self._process_color_sequence()
+        else: # NORMAL
+            sequence = self._process_direction_sequence()
+
         # Expect RPAREN
         if self._current_token().type_ != "RPAREN":
-            self.pattern.errors.append("Expected ')' after color sequence")
+            self.pattern.errors.append("Expected ')' after sequence")
         else:
             self._advance()
             
-        return color_indices
+        return sequence
     
     def _process_color_sequence(self):
         """Process a sequence of color indices in a row."""
@@ -443,116 +446,71 @@ class SemanticAnalyzer:
                 
         return indices
     
-    def _process_normal_pattern(self):
-        """Process NORMAL pattern data with knot instructions."""
-        knots = []
+    def _process_direction_sequence(self):
+        """Process a sequence of knot directions in a row."""
+        directions = []
         
-        # Process knot instructions until we find RBRACE or end of tokens
-        while self._current_token().type_ == "KEYWORDS" and self._current_token().value == "KNOT":
-            # Process knot instruction
-            knot = self._process_knot()
-            if knot:
-                knots.append(knot)
-        
-        self.pattern.knots = knots
-        
-        if len(knots) == 0:
-            self.pattern.errors.append("NORMAL pattern must contain at least one knot instruction")
-    
-    def _process_knot(self):
-        """Process a single KNOT instruction."""
-        # Skip KNOT keyword
-        self._advance()
-        
-        # Expect direction (LEFT or RIGHT)
-        if self._current_token().type_ != "KEYWORDS" or self._current_token().value not in self.valid_directions:
-            self.pattern.errors.append(f"Expected LEFT or RIGHT direction, got {self._current_token().value}")
+        # Get first direction
+        if self._current_token().type_ == "KEYWORDS" and self._current_token().value in self.valid_directions:
+            directions.append(self._current_token().value)
             self._advance()
-            return None
-            
-        direction = self._current_token().value
-        self._advance()
-        
-        # Expect LPAREN
-        if self._current_token().type_ != "LPAREN":
-            self.pattern.errors.append("Expected '(' after knot direction")
+        else:
+            self.pattern.errors.append(f"Expected a direction (LEFT/RIGHT), got {self._current_token().type_}")
             self._advance()
-            return None
+            return directions
             
-        self._advance()
-        
-        # Expect first thread number
-        if self._current_token().type_ != "INTEGER":
-            self.pattern.errors.append("Expected integer for first thread number")
-            self._advance()
-            return None
-            
-        thread1 = int(self._current_token().value)
-        
-        # Validate thread number
-        if thread1 < 1 or thread1 > self.pattern.thread_count:
-            self.pattern.errors.append(f"Thread number {thread1} is out of range (1-{self.pattern.thread_count})")
-            
-        self._advance()
-        
-        # Expect COMMA
-        if self._current_token().type_ != "COMMA":
-            self.pattern.errors.append("Expected ',' between thread numbers")
-            self._advance()
-            return None
-            
-        self._advance()
-        
-        # Expect second thread number
-        if self._current_token().type_ != "INTEGER":
-            self.pattern.errors.append("Expected integer for second thread number")
-            self._advance()
-            return None
-            
-        thread2 = int(self._current_token().value)
-        
-        # Validate thread number
-        if thread2 < 1 or thread2 > self.pattern.thread_count:
-            self.pattern.errors.append(f"Thread number {thread2} is out of range (1-{self.pattern.thread_count})")
-            
-        if thread1 == thread2:
-            self.pattern.errors.append(f"Thread numbers must be different, got {thread1} and {thread2}")
-            
-        self._advance()
-        
-        # Expect RPAREN
-        if self._current_token().type_ != "RPAREN":
-            self.pattern.errors.append("Expected ')' after thread numbers")
-            self._advance()
-            return None
-            
-        self._advance()
-        
-        # Create knot instruction
-        knot = {
-            "direction": direction,
-            "threads": [thread1, thread2],
-            "repeat": 1  # Default repeat value
-        }
-        
-        # Check for optional REPEAT clause
-        if self._current_token().type_ == "KEYWORDS" and self._current_token().value == "REPEAT":
+        # Process additional directions
+        while self._current_token().type_ == "COMMA":
             self._advance()
             
-            if self._current_token().type_ != "INTEGER":
-                self.pattern.errors.append("Expected integer after REPEAT")
-                return knot
-                
-            repeat_count = int(self._current_token().value)
-            
-            if repeat_count <= 0:
-                self.pattern.errors.append(f"Repeat count must be positive, got {repeat_count}")
+            if self._current_token().type_ == "KEYWORDS" and self._current_token().value in self.valid_directions:
+                directions.append(self._current_token().value)
+                self._advance()
             else:
-                knot["repeat"] = repeat_count
+                self.pattern.errors.append(f"Expected a direction after comma, got {self._current_token().type_}")
+                self._advance()
+                break
                 
-            self._advance()
+        return directions
+
+    def _process_normal_pattern(self):
+        """Process NORMAL pattern data by generating knots from rows of directions."""
+        all_knots = []
+        row_index = 0
+        
+        while self._current_token().type_ == "KEYWORDS" and self._current_token().value == "ROW":
+            directions = self._process_row()
             
-        return knot
+            # Determine the starting thread for this row (1 for even rows, 2 for odd rows)
+            start_thread = 1 if row_index % 2 == 0 else 2
+            
+            # Validate row length
+            expected_knots = (self.pattern.thread_count - (start_thread - 1)) // 2
+            if len(directions) != expected_knots:
+                self.pattern.errors.append(f"Row {row_index + 1} has {len(directions)} knots, but {expected_knots} were expected.")
+            
+            # Generate knot instructions for the current row
+            for i, direction in enumerate(directions):
+                thread1 = start_thread + i * 2
+                thread2 = thread1 + 1
+                
+                if thread2 > self.pattern.thread_count:
+                    self.pattern.errors.append(f"Knot in row {row_index + 1} involves a non-existent thread.")
+                    continue
+
+                knot = {
+                    "direction": direction,
+                    "threads": [thread1, thread2],
+                    "repeat": 1
+                }
+                all_knots.append(knot)
+            
+            row_index += 1
+        
+        self.pattern.knots = all_knots
+        
+        if not all_knots:
+            self.pattern.errors.append("NORMAL pattern must contain at least one ROW instruction.")
 
     def _validate_pattern(self):
         """Validate the pattern after all tokens have been processed."""

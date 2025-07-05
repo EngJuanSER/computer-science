@@ -17,13 +17,11 @@ Author: MacraScript Language Team
 # <PATTERN_DATA>    -> <ALPHA_DATA> | <NORMAL_DATA>
 # <ALPHA_DATA>      -> "PATTERN" "{" <ROW_LIST> "}"
 # <ROW_LIST>        -> <ROW> | <ROW> <ROW_LIST>
-# <ROW>             -> "ROW" ":" "(" <COLOR_SEQUENCE> ")"
+# <ROW>             -> "ROW" ":" "(" (<COLOR_SEQUENCE> | <DIRECTION_SEQUENCE>) ")"
 # <COLOR_SEQUENCE>  -> <INTEGER> | <INTEGER> "," <COLOR_SEQUENCE>
-# <NORMAL_DATA>     -> "PATTERN" "{" <KNOT_LIST> "}"
-# <KNOT_LIST>       -> <KNOT_INSTRUCTION> | <KNOT_INSTRUCTION> <KNOT_LIST>
-# <KNOT_INSTRUCTION> -> "KNOT" <DIRECTION> "(" <INTEGER> "," <INTEGER> ")" <REPEAT_CLAUSE>?
+# <NORMAL_DATA>     -> "PATTERN" "{" <ROW_LIST> "}"
+# <DIRECTION_SEQUENCE> -> <DIRECTION> | <DIRECTION> "," <DIRECTION_SEQUENCE>
 # <DIRECTION>       -> "LEFT" | "RIGHT"
-# <REPEAT_CLAUSE>   -> "REPEAT" <INTEGER>
 
 
 class SintacticAnalyzer:
@@ -60,7 +58,6 @@ class SintacticAnalyzer:
             and self.current_token.type_ == "KEYWORDS"
             and self.current_token.value == "START"
         ):
-            print("MacraScript parsing started...")
             self.advance()
         else:
             self.error("START")
@@ -72,7 +69,6 @@ class SintacticAnalyzer:
             and self.current_token.type_ == "KEYWORDS"
             and self.current_token.value == "END"
         ):
-            print("MacraScript parsing completed successfully!")
             self.advance()
             if self.current_token is not None:
                 self.error("No extra tokens expected after END")
@@ -88,7 +84,6 @@ class SintacticAnalyzer:
         ):
             self.pattern_type = self.current_token.value
             self.pattern_data["type"] = self.pattern_type
-            print(f"Pattern Type: {self.pattern_type}")
             self.advance()
         else:
             self.error("ALPHA or NORMAL")
@@ -117,7 +112,6 @@ class SintacticAnalyzer:
                 if self.current_token and self.current_token.type_ == "INTEGER":
                     threads_count = int(self.current_token.value)
                     self.pattern_data["threads"] = threads_count
-                    print(f"Threads: {threads_count}")
                     self.advance()
                 else:
                     self.error("INTEGER after THREADS:")
@@ -140,7 +134,6 @@ class SintacticAnalyzer:
                 if self.current_token and self.current_token.type_ == "INTEGER":
                     width = int(self.current_token.value)
                     self.pattern_data["width"] = width
-                    print(f"Width: {width}")
                     self.advance()
                 else:
                     self.error("INTEGER after WIDTH:")
@@ -159,7 +152,6 @@ class SintacticAnalyzer:
                 if self.current_token and self.current_token.type_ == "INTEGER":
                     height = int(self.current_token.value)
                     self.pattern_data["height"] = height
-                    print(f"Height: {height}")
                     self.advance()
                 else:
                     self.error("INTEGER after HEIGHT:")
@@ -180,7 +172,6 @@ class SintacticAnalyzer:
                     self.advance()
                     colors = self.color_list()
                     self.pattern_data["colors"] = colors
-                    print(f"Colors: {colors}")
                     if self.current_token and self.current_token.type_ == "RPAREN":
                         self.advance()
                     else:
@@ -233,7 +224,6 @@ class SintacticAnalyzer:
                 self.advance()
                 rows = self.row_list()
                 self.pattern_data["pattern_data"] = rows
-                print(f"Pattern rows: {len(rows)}")
                 if self.current_token and self.current_token.type_ == "RBRACE":
                     self.advance()
                 else:
@@ -269,10 +259,16 @@ class SintacticAnalyzer:
                 self.advance()
                 if self.current_token and self.current_token.type_ == "LPAREN":
                     self.advance()
-                    color_sequence = self.color_sequence()
+                    
+                    # Depending on the pattern type, parse color indices or knot directions
+                    if self.pattern_type == "ALPHA":
+                        sequence = self.color_sequence()
+                    else: # NORMAL
+                        sequence = self.direction_sequence()
+
                     if self.current_token and self.current_token.type_ == "RPAREN":
                         self.advance()
-                        return color_sequence
+                        return sequence
                     else:
                         self.error("')' after color sequence")
                 else:
@@ -302,8 +298,28 @@ class SintacticAnalyzer:
         
         return sequence
 
+    def direction_sequence(self):
+        """This method processes a sequence of knot directions (LEFT/RIGHT)."""
+        sequence = []
+        
+        if self.current_token and self.current_token.type_ == "KEYWORDS" and self.current_token.value in ["LEFT", "RIGHT"]:
+            sequence.append(self.current_token.value)
+            self.advance()
+        else:
+            self.error("LEFT or RIGHT direction")
+        
+        while self.current_token and self.current_token.type_ == "COMMA":
+            self.advance()
+            if self.current_token and self.current_token.type_ == "KEYWORDS" and self.current_token.value in ["LEFT", "RIGHT"]:
+                sequence.append(self.current_token.value)
+                self.advance()
+            else:
+                self.error("LEFT or RIGHT direction after comma")
+        
+        return sequence
+
     def normal_data(self):
-        """This method processes NORMAL pattern data."""
+        """This method processes NORMAL pattern data using ROW definitions."""
         if (
             self.current_token
             and self.current_token.type_ == "KEYWORDS"
@@ -312,9 +328,8 @@ class SintacticAnalyzer:
             self.advance()
             if self.current_token and self.current_token.type_ == "LBRACE":
                 self.advance()
-                knots = self.knot_list()
-                self.pattern_data["pattern_data"] = knots
-                print(f"Knot instructions: {len(knots)}")
+                rows = self.row_list() # Re-use row_list for the new structure
+                self.pattern_data["pattern_data"] = rows
                 if self.current_token and self.current_token.type_ == "RBRACE":
                     self.advance()
                 else:
@@ -323,87 +338,6 @@ class SintacticAnalyzer:
                 self.error("'{' after PATTERN")
         else:
             self.error("PATTERN")
-
-    def knot_list(self):
-        """This method processes a list of knot instructions for NORMAL patterns."""
-        knots = []
-        
-        while (
-            self.current_token
-            and self.current_token.type_ == "KEYWORDS"
-            and self.current_token.value == "KNOT"
-        ):
-            knot = self.knot_instruction()
-            knots.append(knot)
-        
-        return knots
-
-    def knot_instruction(self):
-        """This method processes a single knot instruction."""
-        if (
-            self.current_token
-            and self.current_token.type_ == "KEYWORDS"
-            and self.current_token.value == "KNOT"
-        ):
-            self.advance()
-            
-            # Get direction
-            if (
-                self.current_token
-                and self.current_token.type_ == "KEYWORDS"
-                and self.current_token.value in ["LEFT", "RIGHT"]
-            ):
-                direction = self.current_token.value
-                self.advance()
-                
-                # Get thread positions
-                if self.current_token and self.current_token.type_ == "LPAREN":
-                    self.advance()
-                    if self.current_token and self.current_token.type_ == "INTEGER":
-                        thread1 = int(self.current_token.value)
-                        self.advance()
-                        if self.current_token and self.current_token.type_ == "COMMA":
-                            self.advance()
-                            if self.current_token and self.current_token.type_ == "INTEGER":
-                                thread2 = int(self.current_token.value)
-                                self.advance()
-                                if self.current_token and self.current_token.type_ == "RPAREN":
-                                    self.advance()
-                                    
-                                    knot_data = {
-                                        "direction": direction,
-                                        "threads": [thread1, thread2],
-                                        "repeat": 1
-                                    }
-                                    
-                                    # Check for optional repeat clause
-                                    if (
-                                        self.current_token
-                                        and self.current_token.type_ == "KEYWORDS"
-                                        and self.current_token.value == "REPEAT"
-                                    ):
-                                        self.advance()
-                                        if self.current_token and self.current_token.type_ == "INTEGER":
-                                            knot_data["repeat"] = int(self.current_token.value)
-                                            self.advance()
-                                        else:
-                                            self.error("INTEGER after REPEAT")
-                                    
-                                    return knot_data
-                                else:
-                                    self.error("')' after thread positions")
-                            else:
-                                self.error("INTEGER for second thread")
-                        else:
-                            self.error("',' between thread positions")
-                    else:
-                        self.error("INTEGER for first thread")
-                else:
-                    self.error("'(' after direction")
-            else:
-                self.error("LEFT or RIGHT direction")
-        else:
-            self.error("KNOT")
 
     def error(self, expected):
         """This method raises an exception if the current token is not the expected one.
@@ -415,17 +349,6 @@ class SintacticAnalyzer:
         current_type = self.current_token.type_ if self.current_token else "None"
         
         # Mostrar información adicional para depuración
-        print(f"Error: expected {expected}, found '{current}' of type {current_type} at position {self.pos}")
-        
-        # Si hay más tokens, mostrar algunos adelante para contexto
-        context_tokens = []
-        for i in range(self.pos + 1, min(self.pos + 4, len(self.tokens))):
-            token = self.tokens[i]
-            context_tokens.append(f"{token.type_}:'{token.value}'")
-        
-        if context_tokens:
-            print(f"Next tokens: {', '.join(context_tokens)}")
-        
         raise SyntaxError(
             f"Syntax error at position {self.pos}: expected {expected}, found '{current}'"
         )

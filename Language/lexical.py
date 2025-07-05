@@ -32,7 +32,7 @@ class LexicalAnalizer:
             ("KEYWORDS",            r'\b(START|END|PATTERN|ALPHA|NORMAL|THREADS|WIDTH|HEIGHT|COLORS|ROW|KNOT|LEFT|RIGHT|REPEAT)\b'),
             
             # Literals
-            ("COLOR",               r'"[A-Fa-f0-9]{6}"'),  # Hex color codes like "FF0000"
+            ("COLOR",               r'"#?[A-Fa-f0-9]{6}"'),  # Hex color codes like "#FF0000" or "FF0000"
             ("COLOR_NAME",          r'"[a-zA-Z]+"'),       # Color names like "red", "blue"
             ("INTEGER",             r'\d+'),               # Numbers
             ("IDENTIFIER",          r'[a-zA-Z_][a-zA-Z0-9_]*'),

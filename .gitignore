@@ -1,1 +1,8 @@
 /.venv
+__pycache__
+/Documentation/
+*.aux
+*.out
+*.log
+*.gz
+*.toc
