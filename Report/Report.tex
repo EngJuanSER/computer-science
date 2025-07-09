@@ -40,9 +40,10 @@
 
 \hypersetup{
     colorlinks=true,
-    linkcolor=blue,
-    filecolor=magenta,
-    urlcolor=blue,
+    linkcolor=black,
+    citecolor=black,
+    filecolor=black,
+    urlcolor=black,
 }
 
 \title{{\Huge \textbf{Final Technical Report}}\\
@@ -75,32 +76,75 @@ The primary goal of this project was to develop MacraScript, a DSL that allows d
     \item Produce step-by-step graphical guides for executing the pattern.
 \end{itemize}
 
+\section{Motivation and Target Audience}
+The development of MacraScript is driven by the need to provide a specialized tool for a community that has largely been overlooked by modern software development. The primary beneficiaries of this language are:
+\begin{itemize}
+    \item \textbf{Macramé Artisans and Designers:} Professionals and hobbyists who can now create, verify, and iterate on complex patterns with greater speed and accuracy. MacraScript reduces the tediousness of manual drafting and prevents costly errors in the middle of a physical project.
+    \item \textbf{Educators and Learners:} The language serves as an educational tool, helping newcomers understand pattern construction through a logical, structured format. The dual visualization provides a clear link between the abstract code and the physical knotting process.
+    \item \textbf{Digital Crafters:} A growing community of makers who merge traditional crafts with digital tools. MacraScript provides a platform for experimentation, sharing, and archiving patterns in a standardized, reproducible format.
+\end{itemize}
+By creating a bridge between computational thinking and textile art, MacraScript not only streamlines a creative process but also fosters a new way of thinking about and sharing traditional knowledge.
+
 \chapter{Final Language Design}
 
 \section{Overview}
 MacraScript is a declarative DSL designed to be intuitive for macramé artisans. The language is structured around a central \texttt{PATTERN} block, which can be of type \texttt{ALPHA} (for grid-based designs) or \texttt{NORMAL} (for knot-based geometric patterns).
 
-\section{Final Grammar}
-The final grammar for MacraScript, defined in EBNF, is as follows:
+\section{Alphabet and Tokens}
+The language's alphabet includes uppercase and lowercase letters, numbers, and the symbols \texttt{: , \{ \} ( ) "}. Reserved words, or keywords, are \texttt{START, END, PATTERN, ALPHA, NORMAL, THREADS, WIDTH, HEIGHT, COLORS, ROW, LEFT, RIGHT}.
 
-\begin{lstlisting}[language=bash, caption={Final EBNF Grammar for MacraScript}]
+The lexical analyzer uses the following regular expressions to tokenize the input code:
+
+\begin{table}[H]
+    \centering
+    \caption{Token Definitions and Regular Expressions}
+    \label{tab:tokens}
+    \begin{tabular}{|l|l|}
+        \hline
+        \textbf{Token Type} & \textbf{Regular Expression} \\
+        \hline
+        \texttt{KEYWORDS} & \texttt{\textbackslash b(START|END|...|RIGHT)\textbackslash b} \\
+        \texttt{COLOR} & \texttt{"\#?[A-Fa-f0-9]\{6\}"} \\
+        \texttt{COLOR\_NAME} & \texttt{"[a-zA-Z]+"} \\
+        \texttt{INTEGER} & \texttt{\textbackslash d+} \\
+        \texttt{COLON} & \texttt{:} \\
+        \texttt{COMMA} & \texttt{,} \\
+        \texttt{LBRACE} & \texttt{\{} \\
+        \texttt{RBRACE} & \texttt{\}} \\
+        \texttt{LPAREN} & \texttt{\textbackslash(} \\
+        \texttt{RPAREN} & \texttt{\textbackslash)} \\
+        \texttt{SKIP} & \texttt{[ \textbackslash t\textbackslash r\textbackslash n]+} \\
+        \texttt{MISMATCH} & \texttt{.} \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\section{Final Grammar}
+The final grammar for MacraScript is defined in a clear, readable EBNF format. Each production rule is explained to enhance comprehension.
+
+\begin{lstlisting}[language=bash, caption={Final EBNF Grammar for MacraScript}, basicstyle=\ttfamily\small]
+(* Program Structure: Defines the main container for a pattern *)
 <program> ::= "START" <type> <config> <pattern> "END"
 
+(* Pattern Type: Specifies one of the two supported pattern styles *)
 <type> ::= "ALPHA" | "NORMAL"
 
+(* Configuration Block: Contains all setup parameters *)
 <config> ::= <threads> [<dims>] <colors>
 <threads> ::= "THREADS" ":" <INTEGER>
 <dims> ::= ("WIDTH" | "HEIGHT") ":" <INTEGER>
 <colors> ::= "COLORS" ":" "(" <string_list> ")"
 <string_list> ::= <STRING> ("," <STRING>)*
 
+(* Pattern Data: The core block defining the pattern's structure *)
 <pattern> ::= "PATTERN" "{" <row_list> "}"
 <row_list> ::= <row>+
 <row> ::= "ROW" ":" "(" <sequence> ")"
 
+(* Sequence Types: Defines the content of a row based on pattern type *)
 <sequence> ::= <alpha_sequence> | <normal_sequence>
-<alpha_sequence> ::= <INTEGER> ("," <INTEGER>)*
-<normal_sequence> ::= <DIRECTION> ("," <DIRECTION>)*
+<alpha_sequence> ::= <INTEGER> ("," <INTEGER>)* (* A list of color indices *)
+<normal_sequence> ::= <DIRECTION> ("," <DIRECTION>)* (* A list of knot directions *)
 <DIRECTION> ::= "LEFT" | "RIGHT"
 \end{lstlisting}
 
@@ -156,7 +200,14 @@ The MacraScript compiler is a Python application that processes the source code 
 \end{enumerate}
 
 \section{Graphical User Interface (\texttt{compiler.py})}
-The main application module uses Tkinter to provide a simple GUI. It includes a text editor for writing MacraScript code and two canvas widgets for displaying the graphical outputs. This module orchestrates the compilation pipeline and calls the appropriate drawing functions.
+The main application module uses Tkinter to provide a simple GUI. It includes a text editor for writing MacraScript code and two canvas widgets for displaying the graphical outputs. This module orchestrates the compilation pipeline and calls the appropriate drawing functions. A mockup of the proposed UI is shown in Figure \ref{fig:ui_mockup}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{img/ui_mockup.png}
+    \caption{The MacraScript IDE, showing the code editor, visualization panels, and a dedicated error console at the bottom.}
+    \label{fig:ui_mockup}
+\end{figure}
 
 \chapter{Results and Discussion}
 
@@ -193,6 +244,67 @@ This view provides a step-by-step guide for the artisan.
 
 \section{Conclusion}
 The MacraScript project has successfully achieved its objectives. We have designed and implemented a functional DSL and compiler that significantly simplifies the process of creating and visualizing complex macramé patterns. The final system provides a robust tool that bridges the gap between abstract design and the physical craft, demonstrating the power of computational thinking in a non-traditional domain. The refined language syntax for Normal patterns proved to be a critical improvement, making the language more intuitive and powerful.
+
+\chapter{Design Rationale and Reflection}
+
+\section{Language Design Choices}
+The design of MacraScript was guided by the principle of simplicity and a focus on the domain's specific needs.
+\begin{itemize}
+    \item \textbf{Declarative Syntax:} We chose a declarative style over an imperative one to make the language more accessible to users without a programming background. Artisans think in terms of pattern structure, not algorithmic steps. The syntax \texttt{THREADS: 8} is more intuitive than a variable assignment like \texttt{let threads = 8;}.
+    \item \textbf{External DSL:} An external DSL with its own compiler provides maximum flexibility. It allowed us to define a clean syntax, create a robust error-handling pipeline, and generate highly specialized graphical outputs, which would be difficult to achieve with an internal DSL hosted in a general-purpose language.
+    \item \textbf{Abstraction in Normal Patterns:} The most significant design decision was to abstract the knot-pairing logic in \texttt{NORMAL} patterns. Manually tracking which threads form a knot in staggered rows is a major source of errors. By having the user only specify the knot's direction (\texttt{LEFT} or \texttt{RIGHT}), we hide this complexity. The compiler handles the logic of pairing threads (1-2, 3-4 in one row; 2-3, 4-5 in the next), dramatically improving usability.
+\end{itemize}
+
+\section{Compiler and Visualization Choices}
+\begin{itemize}
+    \item \textbf{Dual Graphical Output:} Providing two visualizations was crucial. The \textbf{Pixel Art View} gives an immediate, high-level preview of the final aesthetic, which is essential for design iteration. The \textbf{Knot-Flow Diagram} is a functional, step-by-step guide that is indispensable for the actual crafting process. This duality directly serves the two key phases of a macramé project: design and execution.
+    \item \textbf{Python and Tkinter:} Python was chosen for its rapid development capabilities and extensive libraries. Tkinter, while not the most modern UI toolkit, is included in the standard library, ensuring that the compiler is easy to run on any system without complex dependencies. This aligns with the goal of making the tool accessible.
+\end{itemize}
+
+\chapter{Error Handling}
+A robust compiler must provide clear feedback. We defined a multi-level error-handling strategy that covers all phases of compilation. Errors are designed to be reported to the user in a dedicated console within the UI, as depicted in Figure \ref{fig:error_display}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/error_display.png}
+    \caption{Example of error messages displayed in the UI's console.}
+    \label{fig:error_display}
+\end{figure}
+
+\section{Lexical Errors}
+These occur when the input contains characters not recognized by the language's alphabet.
+\begin{itemize}
+    \item \textbf{Example:} Using an invalid character like \texttt{@} or \texttt{\$}.
+    \item \textbf{Detection:} The lexer's \texttt{MISMATCH} rule catches any character that does not match a defined token.
+    \item \textbf{User Feedback:} \texttt{Lexical Error: Unexpected character '@' at line 5, column 10.}
+\end{itemize}
+
+\section{Syntactic Errors}
+These occur when the code violates the language's grammar rules, even if the tokens are valid.
+\begin{itemize}
+    \item \textbf{Examples:}
+    \begin{itemize}
+        \item Missing a keyword (e.g., forgetting \texttt{START}).
+        \item Forgetting a colon, parenthesis, or brace (e.g., \texttt{THREADS 8}).
+        \item Incorrect order of statements (e.g., placing \texttt{COLORS} before \texttt{THREADS}).
+    \end{itemize}
+    \item \textbf{Detection:} The recursive descent parser in \texttt{sintactic.py} expects specific tokens at each step. If the current token does not match, it raises a \texttt{SyntaxError}.
+    \item \textbf{User Feedback:} \texttt{Syntax Error: Expected ':' after THREADS, found '8' at line 2.}
+\end{itemize}
+
+\section{Semantic Errors}
+These occur when the code is syntactically correct but logically inconsistent with the language's rules.
+\begin{itemize}
+    \item \textbf{Examples:}
+    \begin{itemize}
+        \item \textbf{Inconsistent Dimensions:} Defining \texttt{HEIGHT: 5} but providing only 4 rows in an \texttt{ALPHA} pattern.
+        \item \textbf{Index Out of Bounds:} Using a color index of \texttt{3} when only 2 colors have been defined.
+        \item \textbf{Invalid Value:} Specifying \texttt{THREADS: 0}.
+        \item \textbf{Incorrect Knot Count:} Providing 3 knot directions in a \texttt{NORMAL} row that expects 4.
+    \end{itemize}
+    \item \textbf{Detection:} The \texttt{semantic.py} analyzer performs checks after the code is parsed, validating the relationships between different parts of the program.
+    \item \textbf{User Feedback:} \texttt{Semantic Error: Row 3 has 5 colors, but pattern width is 4.}
+\end{itemize}
 
 \addcontentsline{toc}{chapter}{Bibliography}
 \begin{thebibliography}{00}

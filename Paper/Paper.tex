@@ -38,6 +38,13 @@
     tabsize=2
 }
 \lstset{style=mystyle}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    filecolor=black,
+    urlcolor=black,
+}
 
 \begin{document}
 
@@ -61,25 +68,35 @@ domain-specific language, macramé, compiler, pattern generation, computer graph
 \end{IEEEkeywords}
 
 \section{Introduction}
-Macramé is an ancient textile art form based on creating decorative patterns through organized sequences of knots~\cite{karner2005}. Despite its enduring popularity, the design of complex macramé patterns faces significant challenges, including a high dependency on manual planning, a propensity for errors, and a lack of specialized digital tools.
+Macramé is an ancient textile art form based on creating decorative patterns through organized sequences of knots~\cite{karner2005}. Despite its enduring popularity, the design of complex macramé patterns faces significant challenges, including a high dependency on manual planning, a propensity for errors, and a lack of specialized digital tools. Current methods rely on generic graphic design software or pixel art applications, none of which are optimized for the specific constraints of knot-based textiles.
 
-Current methods rely on grid paper, generic graphic design software, or pixel art applications, none of which are optimized for the specific constraints of knot-based textiles. This work introduces MacraScript, a DSL developed to overcome these limitations. MacraScript enables designers to define macramé patterns through code, specifying parameters such as thread count, colors, and knot sequences. The language's compiler generates two key visual outputs: a preview of the final design and a step-by-step knotting guide, effectively bridging the gap between digital design and physical creation.
+This work introduces MacraScript, a DSL developed to overcome these limitations. MacraScript is aimed at macramé artisans, digital crafters, and educators, providing a specialized tool to create, verify, and share patterns with precision. It enables designers to define macramé patterns through code, specifying parameters such as thread count, colors, and knot sequences. The language's compiler generates two key visual outputs: a preview of the final design and a step-by-step knotting guide, effectively bridging the gap between digital design and physical creation.
 
 \section{Language Design and Grammar}
 MacraScript was designed as a declarative, external DSL with a simple and intuitive syntax. The core concept is the \texttt{PATTERN}, which can be of type \texttt{ALPHA} or \texttt{NORMAL}.
 
 \subsection{Grammar}
-The final grammar of MacraScript is defined as follows:
-\begin{lstlisting}[language=bash, caption={Final EBNF Grammar for MacraScript}]
+The final grammar for MacraScript is defined in a clear, readable EBNF format.
+
+\begin{lstlisting}[language=bash, caption={Final EBNF Grammar for MacraScript}, basicstyle=\ttfamily\small]
+(* Program Structure *)
 <program> ::= "START" <type> <config> <pattern> "END"
+
+(* Pattern Type: ALPHA for grids, NORMAL for knots *)
 <type> ::= "ALPHA" | "NORMAL"
+
+(* Configuration Block *)
 <config> ::= <threads> [<dims>] <colors>
 <threads> ::= "THREADS" ":" <INT>
 <dims> ::= ("WIDTH" | "HEIGHT") ":" <INT>
 <colors> ::= "COLORS" ":" "(" <str_list> ")"
+
+(* Pattern Data Block *)
 <pattern> ::= "PATTERN" "{" <row_list> "}"
 <row_list> ::= <row>+
 <row> ::= "ROW" ":" "(" <sequence> ")"
+
+(* Row Content: Color indices or knot directions *)
 <sequence> ::= <alpha_seq> | <normal_seq>
 <alpha_seq> ::= <INT> ("," <INT>)*
 <normal_seq> ::= <DIR> ("," <DIR>)*
@@ -128,8 +145,16 @@ The MacraScript compiler is implemented in Python and follows a traditional thre
     \item \textbf{Semantic Analysis:} The \texttt{semantic.py} module interprets the parsed structure. It validates semantic rules and, crucially, translates the high-level row-based definition of \texttt{NORMAL} patterns into a concrete list of knot instructions with their corresponding thread pairs.
 \end{enumerate}
 
+\section{Design and Rationale}
+The design of MacraScript was guided by simplicity and domain-specificity.
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Declarative Syntax:} We chose a declarative style (e.g., \texttt{THREADS: 8}) over an imperative one to be intuitive for non-programmers. Artisans define the "what," not the "how."
+    \item \textbf{Abstraction in Normal Patterns:} The language's key innovation is abstracting the staggered knot-pairing logic. The user only specifies a knot's direction (\texttt{LEFT} or \texttt{RIGHT}), and the compiler automatically calculates which threads to pair. This significantly reduces complexity and prevents common errors.
+    \item \textbf{Dual Visualization:} The compiler generates two outputs: a \textbf{Pixel Art Preview} for a high-level aesthetic check, and a \textbf{Knot-Flow Diagram} as a functional, step-by-step guide for crafting. This duality serves both the design and execution phases of a project.
+\end{itemize}
+
 \section{Results: Visual Outputs}
-The compiler generates two distinct visualizations for each pattern, displayed in a Tkinter-based GUI.
+The compiler generates two distinct visualizations for each pattern, displayed in a Tkinter-based GUI. The system includes robust, multi-level error handling (lexical, syntactic, semantic) to provide clear feedback to the user.
 
 \subsection{Pixel Art Visualization}
 This top-view visualization provides a preview of the finished pattern.
@@ -160,7 +185,7 @@ This visualization serves as a step-by-step guide for the artisan.
 \end{figure}
 
 \section{Conclusion}
-MacraScript successfully demonstrates the application of DSL principles to a traditional craft. By abstracting the complexities of macramé pattern design into a simple, declarative language, it lowers the barrier to entry for creating complex designs and reduces the potential for manual error. The implementation of a full compiler that generates dual, coherent visual outputs provides a powerful tool for macramé artisans. Future work could involve expanding the library of knots, developing more advanced visualization techniques, and building a community platform for sharing patterns.
+MacraScript successfully demonstrates the application of DSL principles to a traditional craft. By abstracting the complexities of macramé pattern design into a simple, declarative language, it lowers the barrier to entry for creating complex designs and reduces the potential for manual error. The implementation of a full compiler that generates dual, coherent visual outputs—complemented by clear error reporting—provides a powerful and user-friendly tool for macramé artisans. Future work could involve expanding the library of knots, developing more advanced visualization techniques including interactive diagrams, and building a community platform for sharing patterns.
 
 \begin{thebibliography}{00}
 \bibitem{fowler2010} Fowler, M. (2010). Domain-Specific Languages. Addison-Wesley Professional.
