@@ -10,6 +10,7 @@ Author: Juan Serrano
 import tkinter as tk
 from tkinter import scrolledtext, messagebox
 import re
+import os
 from lexical import LexicalAnalizer
 from sintactic import SintacticAnalyzer
 from semantic import SemanticAnalyzer
@@ -359,12 +360,20 @@ class Compiler:
         Carga un ejemplo de patrón ALPHA en el editor de código.
         """
         try:
-            file_path = "/home/juan-serrano/Documentos/Github/computer-science/Language/ejemplo_simple.txt"
-            with open(file_path, "r") as f:
+             # Obtener la carpeta donde está ubicado este script
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+
+            # Construir la ruta relativa desde la ubicación del script
+            file_path = os.path.join(script_dir, "ejemplo_simple.txt")
+
+
+            with open(file_path, "r", encoding="utf-8") as f:
                 example_code = f.read()
+
             self.code_editor.delete("1.0", tk.END)
             self.code_editor.insert("1.0", example_code)
             messagebox.showinfo("Ejemplo Cargado", "Se ha cargado un ejemplo de patrón ALPHA.")
+
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo cargar el ejemplo: {str(e)}")
             
@@ -373,9 +382,16 @@ class Compiler:
         Carga un ejemplo de patrón NORMAL en el editor de código.
         """
         try:
-            file_path = "/home/juan-serrano/Documentos/Github/computer-science/Language/ejemplo_normal.txt"
-            with open(file_path, "r") as f:
+            # Obtener la carpeta donde está ubicado este script
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+
+            # Construir la ruta relativa desde la ubicación del script
+            file_path = os.path.join(script_dir, "ejemplo_normal.txt")
+
+
+            with open(file_path, "r", encoding="utf-8") as f:
                 example_code = f.read()
+
             self.code_editor.delete("1.0", tk.END)
             self.code_editor.insert("1.0", example_code)
             messagebox.showinfo("Ejemplo Cargado", "Se ha cargado un ejemplo de patrón NORMAL.")
