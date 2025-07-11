@@ -1,55 +1,55 @@
-# MacraScript - Lenguaje para Patrones de Pulseras de Macramé
+# MacraScript - Language for Macrame Bracelet Patterns
 
-MacraScript es un lenguaje simplificado diseñado para describir patrones de pulseras de macramé de una manera natural y fácil de entender.
+MacraScript is a simplified language designed to describe macrame bracelet patterns in a natural and easy-to-understand way.
 
-## Características del Lenguaje
+## Language Features
 
-### Tipos de Patrones Soportados
+### Supported Pattern Types
 
-1. **ALPHA**: Patrones tipo píxel, similares a las pulseras de la amistad con diseños geométricos o letras
-2. **NORMAL**: Patrones basados en nudos específicos, típicos del macramé tradicional
+1. **ALPHA**: Pixel-type patterns, similar to friendship bracelets with geometric designs or letters
+2. **NORMAL**: Patterns based on specific knots, typical of traditional macrame
 
-### Sintaxis Básica
+### Basic Syntax
 
-Todo script de MacraScript debe seguir esta estructura:
+Every MacraScript must follow this structure:
 
 ```
-START <TIPO_DE_PATRON>
-    <CONFIGURACION>
-    <DATOS_DEL_PATRON>
+START <PATTERN_TYPE>
+    <CONFIGURATION>
+    <PATTERN_DATA>
 END
 ```
 
-## Componentes del Lenguaje
+## Language Components
 
-### 1. Configuración Básica
+### 1. Basic Configuration
 
-#### Hilos (THREADS)
-Define cuántos hilos se utilizarán:
+#### Threads (THREADS)
+Defines how many threads will be used:
 ```
 THREADS: 8
 ```
 
-#### Dimensiones
-Define el ancho y alto del patrón:
+#### Dimensions
+Defines the width and height of the pattern:
 ```
 WIDTH: 8
 HEIGHT: 10
 ```
 
-#### Colores
-Define la paleta de colores a utilizar:
+#### Colors
+Defines the color palette to use:
 ```
 COLORS: ("red", "blue", "white")
 ```
-o con códigos hexadecimales:
+or with hexadecimal codes:
 ```
 COLORS: ("FF0000", "0000FF", "FFFFFF")
 ```
 
-### 2. Patrones ALPHA
+### 2. ALPHA Patterns
 
-Los patrones ALPHA definen cada fila usando índices de colores:
+ALPHA patterns define each row using color indices:
 
 ```
 START ALPHA
@@ -66,60 +66,58 @@ PATTERN {
 END
 ```
 
-- Los números en ROW corresponden a los índices de colores (0=primer color, 1=segundo color, etc.)
-- Cada ROW representa una fila horizontal del patrón
+- Numbers in ROW correspond to color indices (0=first color, 1=second color, etc.)
+- Each ROW represents a horizontal row of the pattern
 
-### 3. Patrones NORMAL
+### 3. NORMAL Patterns
 
-Los patrones NORMAL definen secuencias de nudos:
+NORMAL patterns define sequences of knots per row, indicating the direction of each knot.
 
 ```
 START NORMAL
-THREADS: 6
-WIDTH: 4
-HEIGHT: 8
-COLORS: ("FF0000", "0000FF")
+THREADS: 8
+COLORS: ("red", "blue", "yellow", "green", "magenta", "cyan", "orange", "purple")
+
 PATTERN {
-    KNOT LEFT (1, 2)
-    KNOT RIGHT (2, 3) REPEAT 2
-    KNOT LEFT (3, 4)
-    KNOT RIGHT (4, 5)
+    ROW: (RIGHT, RIGHT, RIGHT, RIGHT)
+    ROW: (LEFT, LEFT, LEFT)
+    ROW: (RIGHT, RIGHT, RIGHT, RIGHT)
+    ROW: (LEFT, LEFT, LEFT)
+    ROW: (RIGHT, RIGHT, RIGHT, RIGHT)
 }
 END
 ```
 
-- `KNOT LEFT/RIGHT (hilo1, hilo2)`: Define un nudo hacia la izquierda o derecha entre dos hilos
-- `REPEAT N`: Opcional, repite el nudo N veces
-- Los números de hilos van de 1 a N (según THREADS)
+- `ROW: (DIRECTION, ...)`: Defines a row of knots. Each `DIRECTION` can be `LEFT` or `RIGHT`.
+- The number of knots per row depends on the number of threads (`THREADS`) and the row's parity.
+- Knots are formed between adjacent threads, and the direction indicates which thread "acts" on the other.
 
-## Tokens del Lenguaje
+## Language Tokens
 
-### Palabras Clave (KEYWORDS)
-- `START`, `END`: Delimitadores del script
-- `ALPHA`, `NORMAL`: Tipos de patrón
-- `THREADS`, `WIDTH`, `HEIGHT`: Configuración de dimensiones
-- `COLORS`: Definición de colores
-- `PATTERN`: Inicio de datos del patrón
-- `ROW`: Fila en patrones ALPHA
-- `KNOT`: Nudo en patrones NORMAL
-- `LEFT`, `RIGHT`: Direcciones de nudos
-- `REPEAT`: Repetición de instrucciones
+### Keywords (KEYWORDS)
+- `START`, `END`: Script delimiters
+- `ALPHA`, `NORMAL`: Pattern types
+- `THREADS`, `WIDTH`, `HEIGHT`: Dimension configuration
+- `COLORS`: Color definition
+- `PATTERN`: Start of pattern data
+- `ROW`: Pattern data row (for ALPHA or NORMAL)
+- `LEFT`, `RIGHT`: Knot directions (for NORMAL patterns)
 
-### Literales
-- `COLOR`: Códigos hexadecimales como `"FF0000"`
-- `COLOR_NAME`: Nombres de colores como `"red"`
-- `INTEGER`: Números enteros
-- `IDENTIFIER`: Identificadores (nombres de variables)
+### Literals
+- `COLOR`: Hexadecimal codes like `"FF0000"`
+- `COLOR_NAME`: Color names like `"red"`
+- `INTEGER`: Integers
+- `IDENTIFIER`: Identifiers (variable names)
 
-### Puntuación
-- `:`: Separador tipo/valor
-- `,`: Separador de elementos en listas
-- `{`, `}`: Delimitadores de bloques
-- `(`, `)`: Delimitadores de parámetros
+### Punctuation
+- `:`: Type/value separator
+- `,`: Element separator in lists
+- `{`, `}`: Block delimiters
+- `(`, `)`: Parameter delimiters
 
-## Ejemplos Completos
+## Complete Examples
 
-### Ejemplo 1: Patrón de Rayas (ALPHA)
+### Example 1: Stripe Pattern (ALPHA)
 ```
 START ALPHA
 THREADS: 6
@@ -139,33 +137,31 @@ PATTERN {
 END
 ```
 
-### Ejemplo 2: Patrón de Nudos Simple (NORMAL)
+### Example 2: Complex Knot Pattern (NORMAL)
 ```
 START NORMAL
-THREADS: 4
-WIDTH: 2
-HEIGHT: 6
-COLORS: ("0000FF", "FFFF00")
+THREADS: 8
+COLORS: ("red", "blue", "yellow", "green", "magenta", "cyan", "orange", "purple")
+
 PATTERN {
-    KNOT LEFT (1, 2)
-    KNOT RIGHT (3, 4)
-    KNOT LEFT (2, 3)
-    KNOT RIGHT (1, 4) REPEAT 2
-    KNOT LEFT (1, 3)
-    KNOT RIGHT (2, 4)
+    ROW: (RIGHT, RIGHT, RIGHT, RIGHT)
+    ROW: (LEFT, LEFT, LEFT)
+    ROW: (RIGHT, RIGHT, RIGHT, RIGHT)
+    ROW: (LEFT, LEFT, LEFT)
+    ROW: (RIGHT, RIGHT, RIGHT, RIGHT)
 }
 END
 ```
 
-## Uso del Analizador
+## Analyzer Usage
 
-Para usar el analizador léxico y sintáctico:
+To use the lexical and syntactic analyzer:
 
 ```python
 from lexical import LexicalAnalizer
 from sintactic import SintacticAnalyzer
 
-# Tu script de MacraScript
+# Your MacraScript code
 script = """
 START ALPHA
 THREADS: 4
@@ -179,24 +175,24 @@ PATTERN {
 END
 """
 
-# Análisis léxico
+# Lexical analysis
 tokens = LexicalAnalizer.lex(script)
 
-# Análisis sintáctico
+# Syntactic analysis
 parser = SintacticAnalyzer(tokens)
 result = parser.parse()
 
 print(result)
 ```
 
-## Salida del Analizador
+## Analyzer Output
 
-El analizador sintáctico devuelve un diccionario con:
-- `type`: Tipo de patrón ("ALPHA" o "NORMAL")
-- `threads`: Número de hilos
-- `width`: Ancho del patrón
-- `height`: Alto del patrón
-- `colors`: Lista de colores
-- `pattern_data`: Datos del patrón (filas para ALPHA, nudos para NORMAL)
+The syntactic analyzer returns a dictionary with:
+- `type`: Pattern type ("ALPHA" or "NORMAL")
+- `threads`: Number of threads
+- `width`: Pattern width
+- `height`: Pattern height
+- `colors`: List of colors
+- `pattern_data`: Pattern data (rows for ALPHA, knots for NORMAL)
 
-Esta estructura puede ser utilizada posteriormente por un renderizador para generar la visualización gráfica del patrón de macramé.
+This structure can later be used by a renderer to generate the graphical visualization of the macrame pattern.
